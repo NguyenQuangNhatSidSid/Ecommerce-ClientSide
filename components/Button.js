@@ -28,7 +28,7 @@ export const ButtonStyle = css`
       border: 1px solid #fff;
     `}
   ${(props) =>
-    props.primary === "l" &&
+    props.primary &&
     css`
       background-color: #5542f6;
       color: #fff;
