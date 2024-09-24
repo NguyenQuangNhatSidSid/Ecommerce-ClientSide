@@ -55,7 +55,7 @@ export default function Featured({ product }) {
                 >
                   Read more
                 </ButtonLink>
-                <Button primary size="l">
+                <Button white size="l">
                   <CartIcon />
                   Add to cart
                 </Button>
