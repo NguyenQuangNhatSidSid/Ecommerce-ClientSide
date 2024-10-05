@@ -2,6 +2,7 @@ import Button from "@/components/Button";
 import { CartContext } from "@/components/CartContext";
 import Center from "@/components/Center";
 import Header from "@/components/Header";
+import Input from "@/components/Input";
 import Table from "@/components/Table";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
@@ -19,7 +20,9 @@ const Box = styled.div`
   padding: 30px;
 `;
 
-const ProductInfoCell = styled.td``;
+const ProductInfoCell = styled.td`
+  padding: 10px 0;
+`;
 
 const ProductImageBox = styled.div`
   width: 100px;
@@ -36,16 +39,57 @@ const ProductImageBox = styled.div`
   }
 `;
 
+const QuantityLabel = styled.span`
+  padding: 0 3px;
+`;
+
+const CityHolder = styled.div`
+  display: flex;
+  gap: 5px;
+`;
+
 export default function CartPage() {
-  const { cartProducts } = useContext(CartContext);
+  const { cartProducts, addProduct, removeProduct } = useContext(CartContext);
   const [products, setProducts] = useState();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [country, setCountry] = useState("");
   useEffect(() => {
     if (cartProducts.length > 0) {
       axios.post("/api/cart", { ids: cartProducts }).then((response) => {
         setProducts(response.data);
       });
+    } else {
+      setProducts([]);
     }
   }, [cartProducts]);
+
+  function moreOfThisProduct(id) {
+    addProduct(id);
+  }
+  function lessOfThisProduct(id) {
+    removeProduct(id);
+  }
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    if (Array.isArray(products) && cartProducts.length > 0) {
+      let newTotal = 0;
+      for (const productId of cartProducts) {
+        if (cartProducts) {
+          const product = products.find((p) => p._id === productId);
+          const price = product ? product.price : 0;
+          newTotal += parseFloat(price);
+        }
+        setTotal(newTotal);
+      }
+    } else {
+      setTotal(0);
+    }
+  }, [products, cartProducts]);
 
   return (
     <>
@@ -69,16 +113,36 @@ export default function CartPage() {
                     <tr key={product._id}>
                       <ProductInfoCell>
                         <ProductImageBox>
-                          <img src={product.images[0]} />
+                          <img src={product.images[0]} alt="" />
                         </ProductImageBox>
                         {product.title}{" "}
                       </ProductInfoCell>
                       <td>
-                        {cartProducts.filter((id) => id === product._id).length}
+                        <Button onClick={() => lessOfThisProduct(product._id)}>
+                          -
+                        </Button>
+                        <QuantityLabel>
+                          {
+                            cartProducts.filter((id) => id === product._id)
+                              .length
+                          }
+                        </QuantityLabel>
+                        <Button onClick={() => moreOfThisProduct(product._id)}>
+                          +
+                        </Button>
                       </td>
-                      <td>{product.price}</td>
+                      <td>
+                        ${" "}
+                        {cartProducts.filter((id) => id === product._id)
+                          .length * product.price}
+                      </td>
                     </tr>
                   ))}
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td>$ {total}</td>
+                  </tr>
                 </tbody>
               </Table>
             )}
@@ -86,8 +150,45 @@ export default function CartPage() {
           {!!cartProducts?.length && (
             <Box>
               <h2>Information order</h2>
-              <input type="text" placeholder="Address" />
-              <input type="text" placeholder="Address2" />
+              <Input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(ev) => setName(ev.target.value)}
+              />
+              <Input
+                type="text"
+                placeholder="Email"
+                value={email}
+                onChange={(ev) => setEmail(ev.target.value)}
+              />
+              <CityHolder>
+                <Input
+                  type="text"
+                  placeholder="City"
+                  value={city}
+                  onChange={(ev) => setCity(ev.target.value)}
+                />
+                <Input
+                  type="text"
+                  placeholder="Postal Code"
+                  value={postalCode}
+                  onChange={(ev) => setPostalCode(ev.target.value)}
+                />
+              </CityHolder>
+
+              <Input
+                type="text"
+                placeholder="Street Address"
+                value={streetAddress}
+                onChange={(ev) => setStreetAddress(ev.target.value)}
+              />
+              <Input
+                type="text"
+                placeholder="Country"
+                value={country}
+                onChange={(ev) => setCountry(ev.target.value)}
+              />
               <Button black block>
                 Continue payment
               </Button>
