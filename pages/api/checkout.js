@@ -9,9 +9,28 @@ export default async function handler(req, res) {
     return;
   }
   await mongooseConnect();
-  const { name, email, city, postalCode, streetAddress, country, products } =
-    req.body;
-  const productIds = Array.isArray(products) ? products : products.split(",");
+  const {
+    name,
+    email,
+    city,
+    postalCode,
+    streetAddress,
+    country,
+    cartProducts,
+  } = req.body;
+
+  const productIds = Array.isArray(cartProducts) ? cartProducts : cartProducts;
+  if (
+    !name ||
+    !email ||
+    !city ||
+    !postalCode ||
+    !streetAddress ||
+    !country ||
+    !Array.isArray(cartProducts)
+  ) {
+    return res.status(400).json({ message: "All fields are required." });
+  }
   const uniqueIds = [...new Set(productIds)];
   const productsInfos = await Product.find({ _id: uniqueIds });
 
@@ -20,14 +39,14 @@ export default async function handler(req, res) {
     const productInfo = productsInfos.find(
       (p) => p._id.toString() === productId
     );
-    const quantity = products.filter((id) => id === productId)?.length || 0;
+    const quantity = cartProducts.filter((id) => id === productId)?.length || 0;
     if (quantity > 0 && productInfo) {
       line_items.push({
         quantity,
         price_data: {
           currency: "USD",
           product_data: { name: productInfo.title },
-          unit_amount: quantity * productInfo.price * 100,
+          unit_amount: productInfo.price * 100,
         },
       });
     }
@@ -47,7 +66,7 @@ export default async function handler(req, res) {
     line_items,
     mode: "payment",
     customer_email: email,
-    success_url: process.env.PUBLIC_URL + "/cart?sucess=1",
+    success_url: process.env.PUBLIC_URL + "/cart?success=1",
     cancel_url: process.env.PUBLIC_URL + "/cart?canceled=1",
     metadata: { orderId: orderDoc._id.toString() },
   });
