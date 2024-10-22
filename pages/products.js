@@ -1,5 +1,6 @@
 import Center from "@/components/Center";
 import Header from "@/components/Header";
+import ProductsGrid from "@/components/ProductsGrid";
 import mongooseConnect from "@/lib/mongoose";
 import { Product } from "@/models/Product";
 import styled from "styled-components";
@@ -9,13 +10,12 @@ const Title = styled.h1`
 `;
 
 export default function ProductsPage({ products }) {
-  console.log({ products });
   return (
     <>
       <Header />
       <Center>
-        <h1> All Products</h1>
-        {products?.length}
+        <Title> All Products</Title>
+        <ProductsGrid products={products} />
       </Center>
     </>
   );
