@@ -57,8 +57,8 @@ export const ButtonStyle = css`
 
 
   ${(props) =>
-    !props.outline &&
     props.primary &&
+    !props.outline &&
     css`
       background-color: ${primary};
       color: #fff;

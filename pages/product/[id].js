@@ -1,5 +1,8 @@
+import Button from "@/components/Button";
 import Center from "@/components/Center";
 import Header from "@/components/Header";
+import CartIcon from "@/components/icons/CartIcon";
+import ProductImages from "@/components/ProductImages";
 import Title from "@/components/Title";
 import WhiteBox from "@/components/WhiteBox";
 import mongooseConnect from "@/lib/mongoose";
@@ -13,6 +16,12 @@ const ColWrapper = styled.div`
   margin-top: 40px;
 `;
 
+const PriceRow = styled.div`
+  gap: 20px;
+  display: flex;
+  align-items: center;
+`;
+
 export default function ProductPage({ product }) {
   return (
     <>
@@ -20,11 +29,20 @@ export default function ProductPage({ product }) {
       <Center>
         <ColWrapper>
           <WhiteBox>
-            <img style={{ maxWidth: "100%" }} src={product.image?.[0]} />
+            <ProductImages images={product.images} />
           </WhiteBox>
           <div>
             <Title>{product.title}</Title>
             <p>{product.description}</p>
+            <PriceRow>
+              <div>${product.price}</div>
+              <div>
+                <Button primary>
+                  <CartIcon />
+                  Add to cart
+                </Button>
+              </div>
+            </PriceRow>
           </div>
         </ColWrapper>
       </Center>
